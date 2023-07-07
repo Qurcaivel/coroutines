@@ -11,5 +11,4 @@ It also doesn't provide modern coroutines aka generators and implements basic ma
 - [x] error-prone API (int/~~result~~ format);
 - [ ] protected stack;
 - [ ] extendable stack;
-- [x] runtime space checks;
 - [ ] compile-time space checks.
