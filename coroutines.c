@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define CR_STACK_SIZE (4 * 4096)
+
 // Coroutine task representation
 
 struct coroutine {
@@ -16,7 +18,6 @@ struct coroutine {
     void* args;
     void* ss;
     void* sp;
-    size_t ssize;
 };
 
 // Round-robin linked list implementation
@@ -133,20 +134,31 @@ void rr_loop()
     }
 }
 
-void rr_coroutine_create(void (*routine)(void*), void* args)
+int rr_coroutine_create(void (*routine)(void*), void* args)
 {
-    struct rr_node* node = malloc(sizeof(*node));   // TODO: comp with NULL
+    struct rr_node* node;
+    void* stack;
+
+    if(!(node = malloc(sizeof(*node)))){
+        return -1;
+    }
+
+    if(!(stack = malloc(CR_STACK_SIZE))){
+        return -1;
+    }
+
     struct coroutine* cr = &node->crt;
     cr->status = ST_CREATED;
     cr->routine = routine;
     cr->args = args;
-    cr->ssize = 4 * 4096;                           // TODO: prep COROUTINE_SSIZE
-    cr->ss = malloc(cr->ssize);                     // TODO: comp with NULL
-    cr->sp = cr->ss + cr->ssize;
+    cr->ss = stack;
+    cr->sp = cr->ss + CR_STACK_SIZE;
     rr_push_back(node);
+
+    return 0;
 }
 
-void rr_coroutine_yield()                           // TODO: "inside-coroutine" check
+void rr_coroutine_yield()
 {
     if(setjmp(rr.current->crt.context)){
         return;
@@ -156,7 +168,7 @@ void rr_coroutine_yield()                           // TODO: "inside-coroutine" 
     }
 }
 
-void rr_coroutine_exit()                            // TODO: "inside-coroutine" check
+void rr_coroutine_exit()
 {
     longjmp(rr.context, RT_EXIT);
 }

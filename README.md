@@ -8,7 +8,7 @@ It also doesn't provides modern coroutines aka generators and implements basic m
 
 # todo
 
-- [ ] error-prone API (int/result format);
+- [x] error-prone API (int/~~result~~ format);
 - [ ] protected stack;
 - [ ] extendable stack;
 - [x] runtime space checks;
