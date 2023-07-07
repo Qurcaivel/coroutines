@@ -79,19 +79,17 @@ static void rr_proc_coroutine()
     if(!rr.current){
         return;
     }
-
     rr.current = rr.current->next;
 
     struct rr_node* node = rr.current;
     struct coroutine* cr = &node->crt;
 
     if(cr->status == ST_CREATED){
-        // switch stack
         register void* sp = cr->sp;
 
         asm volatile(
             "mov %[rs], %%rsp\n"
-            : [rs] "+r" (sp) ::
+            : [ rs ] "+r" (sp) ::
         );
 
         cr->status = ST_RUNNING;
@@ -116,10 +114,14 @@ static void rr_drop_coroutine()
 
 void rr_loop()
 {
+    if(!rr.current){
+        return;
+    }
+    rr.current = rr.current->prev;
+
     switch(setjmp(rr.context)){
         case RT_EXIT:
             rr_drop_coroutine();
-            break;
 
         case RT_INIT:
         case RT_SHED:
