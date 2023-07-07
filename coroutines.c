@@ -69,7 +69,7 @@ static void rr_pop_front(void)
 // Private implementation
 
 enum {
-    RT_INIT,
+    RT_INIT = 0,
     RT_SHED,
     RT_EXIT,
 };
