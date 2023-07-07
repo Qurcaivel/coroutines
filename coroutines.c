@@ -146,7 +146,7 @@ void rr_coroutine_create(void (*routine)(void*), void* args)
     rr_push_back(node);
 }
 
-void rr_coroutine_yield()
+void rr_coroutine_yield()                           // TODO: "inside-coroutine" check
 {
     if(setjmp(rr.current->crt.context)){
         return;
@@ -156,7 +156,7 @@ void rr_coroutine_yield()
     }
 }
 
-void rr_coroutine_exit()
+void rr_coroutine_exit()                            // TODO: "inside-coroutine" check
 {
     longjmp(rr.context, RT_EXIT);
 }
